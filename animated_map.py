@@ -3,11 +3,10 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import os
 import numpy as np
+import mplleaflet
 
-
+# create some dummy data
 days_split = [2, 3, 5, 5, 7, 8, 9, 11, 14, 16, 8, 12, 6, 4]  # total should be length of lats/longs lists
-
-
 days = []
 
 for i in range(len(days_split)):
@@ -23,7 +22,6 @@ my_map = Basemap(resolution='f', # c, l, i, h, f or None
                  projection='merc',
                  lat_0=54.5, lon_0=-4.36,
                  llcrnrlon=-1.9, llcrnrlat=53.4, urcrnrlon=-1.2, urcrnrlat=53.7)
-
 
 my_map.drawcoastlines()
 my_map.drawcountries()
@@ -65,8 +63,10 @@ def animate(i):
 
     x1, y1 = my_map(longs, lats)
     x2, y2 = my_map(alt_longs, alt_lats)
+
     my_map.plot(x1, y1, '.', markersize='9', alpha=0.75, color='r')
     my_map.plot(x2, y2, '.', markersize='9', alpha=0.75, color='g')
+
 
 # call the animator.  blit=True means only re-draw the parts that have changed.
 anim = animation.FuncAnimation(plt.gcf(), animate, frames=len(set(days)), interval=2000, blit=False, repeat=False)
@@ -75,3 +75,4 @@ anim = animation.FuncAnimation(plt.gcf(), animate, frames=len(set(days)), interv
 figManager = plt.get_current_fig_manager()
 figManager.window.showMaximized()
 plt.show()
+
