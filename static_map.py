@@ -59,15 +59,13 @@ html_file_list = glob.glob(glob_folder)
 index = 1
 
 
-
-
 for html_file in html_file_list:
 
     # get the name into the right format
     temp_name = "file://" + html_file
 
     # open in webpage
-    driver = webdriver.Firefox()
+    driver = webdriver.Chrome()
     driver.get(temp_name)
     save_name = str(index) + '.png'
     driver.save_screenshot(save_name)
@@ -77,5 +75,10 @@ for html_file in html_file_list:
     img = Image.open(save_name)
     box = (0, 0, 1440, 740)
     area = img.crop(box)
-    area.save('00' + str(index), 'png')
+
+    if len(index) > 1:
+        area.save('0' + str(index), 'png')
+    else:
+        area.save('00' + str(index), 'png')
+
     index += 1
