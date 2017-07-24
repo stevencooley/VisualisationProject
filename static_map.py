@@ -11,49 +11,47 @@ import pandas as pd
 
 blackpool_df = pd.read_csv("BlackpoolMOD.csv")
 
+# creating lists of data
 lat = blackpool_df['LATITUDE'].tolist()
 long = blackpool_df['LONGITUDE'].tolist()
 response = blackpool_df['Day'].tolist()
-
+rs_list = len(response)
 
 
 # define some functions...
-def lat_plot_data(i, input_list):
+def plot_data(i, input_list, list_length):
 
-    subset_len = len([entry for entry in response if entry <= i])
-    coord_list = input_list[0:subset_len]
-    return coord_list
-
-
-def long_plot_data(i, input_list):
-
-    subset_len = len([entry for entry in response if entry <= i])
-    coord_list = input_list[0:subset_len]
-    return coord_list
+    subset_len = len([entry for entry in response if entry >= i])
+    subset_pos = list_length - subset_len
+    nr_coord_list = input_list[subset_pos:]
+    coord_list = input_list[:subset_pos]
+    return nr_coord_list, coord_list
 
 
-for day in range(1,28):
+for day in range(max(response)):
 
-    lats = lat_plot_data(day, lat)
-    longs = long_plot_data(day, long)
+    nr_lats, lats = plot_data(day, lat, rs_list)
+    nr_longs, longs = plot_data(day, long, rs_list)
 
-    plt.plot(longs, lats, 'rs')  # Draw red squares
+    plt.plot(longs, lats, 'gs')  # Draws green squares
+    plt.plot(nr_longs, nr_lats, 'rs')   # Draws red squares
 
     mplleaflet.save_html(fileobj=str(day)+".html")
-    # save as image
+    # saves as image
 
-"""
+
 
 # get a list of all the files to open
 glob_folder = os.path.join(os.getcwd(), '*.html')
 
 html_file_list = glob.glob(glob_folder)
-index = 1
 
 for html_file in html_file_list:
 
     # get the name into the right format
     temp_name = "file://" + html_file
+
+    index = int(temp_name[58:-5])
 
     # open in webpage
     driver = webdriver.Firefox()
@@ -70,9 +68,7 @@ for html_file in html_file_list:
     if index >= 10:
         area.save('0' + str(index), 'png')
     else:
-        area.save('00' + str(index), '.png')
+        area.save('00' + str(index), 'png')
 
-    index += 1
 
-"""
 
