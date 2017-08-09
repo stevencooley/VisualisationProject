@@ -5,9 +5,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import glob
 from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
 from selenium import webdriver
 import os
 import pandas as pd
+import time
 
 blackpool_df = pd.read_csv("BlackpoolMOD.csv")
 
@@ -33,12 +36,22 @@ for day in range(max(response)):
     nr_lats, lats = plot_data(day, lat, rs_list)
     nr_longs, longs = plot_data(day, long, rs_list)
 
-    plt.plot(longs, lats, 'gs')  # Draws green squares
-    plt.plot(nr_longs, nr_lats, 'rs')   # Draws red squares
+    plt.plot(longs, lats, 'gs', markersize=3)  # Draws green squares
+    plt.plot(nr_longs, nr_lats, 'rs', markersize=3)   # Draws red squares
+
+
+    """
+    # First attempt to put in label - created world map
+    fig = plt.figure()
+    fig.suptitle('Day ' + str(response), fontsize=14, fontweight='bold')
+
+    # Second attempt to put in label - created graph
+    plt.title('Day ' + str(response))
+    plt.show()
+    """
 
     mplleaflet.save_html(fileobj=str(day)+".html")
-    # saves as image
-
+    # saves as html file
 
 
 # get a list of all the files to open
@@ -56,13 +69,21 @@ for html_file in html_file_list:
     # open in webpage
     driver = webdriver.Firefox()
     driver.get(temp_name)
+    time.sleep(1.5)
     save_name = str(index) + '.png'
     driver.save_screenshot(save_name)
     driver.quit()
 
-    # crop as required
     img = Image.open(save_name)
-    box = (0, 0, 1440, 740)
+    draw = ImageDraw.Draw(img)
+
+    fontPath = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    font = ImageFont.truetype(fontPath, 32)
+    draw.text((310, 110), "Day " + str(index), (0, 0, 0), font=font)
+    img.save(save_name)
+
+    # crop as required
+    box = (300, 100, 1000, 800)
     area = img.crop(box)
 
     if index >= 10:
