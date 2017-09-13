@@ -12,45 +12,52 @@ import os
 import pandas as pd
 import time
 
-blackpool_df = pd.read_csv("BlackpoolMOD.csv")
+blackpool_df = pd.read_csv("BlackpoolMOD3.csv")
+print(blackpool_df.head())
+print(len(blackpool_df))
+
+for row in blackpool_df['Visit Outcome']:
+
+    temp_df = blackpool_df.loc[blackpool_df['Visit Outcome'] == 'No response']
+
+print(len(temp_df))
 
 # creating lists of data
 lat = blackpool_df['LATITUDE'].tolist()
 long = blackpool_df['LONGITUDE'].tolist()
-response = blackpool_df['Day'].tolist()
-rs_list = len(response)
+day = blackpool_df['Day'].tolist()
+response = blackpool_df['Visit Outcome'].tolist()
+rs_list = len(day)
 
+
+# Attempting to define non-responses for purposes of separation
+
+def non_response(response):
+    for idx, val in enumerate(response):
+        if val.lower() == 'no response':
+            day[idx] += range(max(27) - day[idx])
+
+non_response(response)
 
 # define some functions...
 def plot_data(i, input_list, list_length):
 
-    subset_len = len([entry for entry in response if entry >= i])
+    subset_len = len([entry for entry in day if entry >= i])
     subset_pos = list_length - subset_len
     nr_coord_list = input_list[subset_pos:]
     coord_list = input_list[:subset_pos]
     return nr_coord_list, coord_list
 
 
-for day in range(max(response)):
+for date in range(max(day)):
 
-    nr_lats, lats = plot_data(day, lat, rs_list)
-    nr_longs, longs = plot_data(day, long, rs_list)
+    nr_lats, lats = plot_data(date, lat, rs_list)
+    nr_longs, longs = plot_data(date, long, rs_list)
 
-    plt.plot(longs, lats, 'gs', markersize=3)  # Draws green squares
-    plt.plot(nr_longs, nr_lats, 'rs', markersize=3)   # Draws red squares
+    plt.plot(longs, lats, 'gs', markersize=1)  # Draws green squares
+    plt.plot(nr_longs, nr_lats, 'rs', markersize=1)   # Draws red squares
 
-
-    """
-    # First attempt to put in label - created world map
-    fig = plt.figure()
-    fig.suptitle('Day ' + str(response), fontsize=14, fontweight='bold')
-
-    # Second attempt to put in label - created graph
-    plt.title('Day ' + str(response))
-    plt.show()
-    """
-
-    mplleaflet.save_html(fileobj=str(day)+".html")
+    mplleaflet.save_html(fileobj=str(date)+".html")
     # saves as html file
 
 
@@ -90,6 +97,5 @@ for html_file in html_file_list:
         area.save('0' + str(index), 'png')
     else:
         area.save('00' + str(index), 'png')
-
 
 
